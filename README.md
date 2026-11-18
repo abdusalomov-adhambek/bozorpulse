@@ -364,3 +364,4 @@ curl -sS http://localhost:8080/health
 - [DATA-MODEL.md](docs/DATA-MODEL.md) — full PostgreSQL schema, indexes, relationships, ER diagram, status enums.
 - [ROADMAP.md](docs/ROADMAP.md) — phases 0–3, epics, acceptance criteria, risks, KPIs, effort, and MVP out-of-scope list.
 # bozorpulse
+# bozorpulse
