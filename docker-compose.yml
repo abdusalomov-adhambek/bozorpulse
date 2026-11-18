@@ -1,0 +1,77 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bozorpulse
+      POSTGRES_PASSWORD: bozorpulse
+      POSTGRES_DB: bozorpulse
+    ports:
+      - "55433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      - ./backend/migrations/002_product_pricing.sql:/docker-entrypoint-initdb.d/002_pricing.sql:ro
+      - ./backend/migrations/003_delivery_zones.sql:/docker-entrypoint-initdb.d/003_delivery.sql:ro
+      - ./backend/migrations/004_ai_conversation.sql:/docker-entrypoint-initdb.d/004_ai.sql:ro
+      - ./backend/seeds/seed.sql:/docker-entrypoint-initdb.d/005_seed.sql:ro
+      - ./backend/seeds/demo_expansion.sql:/docker-entrypoint-initdb.d/006_demo_expansion.sql:ro
+      - ./backend/migrations/007_planning.sql:/docker-entrypoint-initdb.d/007_planning.sql:ro
+      - ./backend/seeds/008_planning_seed.sql:/docker-entrypoint-initdb.d/008_planning_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bozorpulse -d bozorpulse"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      BP_ADDR: ":8080"
+      DATABASE_URL: postgres://bozorpulse:bozorpulse@postgres:5432/bozorpulse?sslmode=disable
+      APP_ENV: development
+      AI_LLM_ENABLED: ${AI_LLM_ENABLED:-true}
+      LLM_API_URL: ${LLM_API_URL:-https://api.meta.ai/v1}
+      MODEL_API_KEY: ${MODEL_API_KEY:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-muse-spark-1.3}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  platform:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./platform:/app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  website:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./website:/app
+    environment:
+      NUXT_PUBLIC_API_BASE: http://localhost:8080/api/v1
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "3001:3000"
+    depends_on:
+      - api
+
+  prototype:
+    image: nginx:1.27-alpine
+    ports:
+      - "4173:80"
+    volumes:
+      - ./prototype:/usr/share/nginx/html:ro
+
+volumes:
+  pgdata:

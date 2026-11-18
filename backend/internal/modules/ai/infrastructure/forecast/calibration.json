@@ -1,0 +1,86 @@
+{
+  "version": "1.0",
+  "note": "Derived from sources/price_prediction_rules-chatgpt.md and sources/price-prediction-rules-claude.md. All beta_pct_per_sd values are null until rolling-origin backtests calibrate them; a null beta means zero weather adjustment.",
+  "default_price_type": "spot",
+  "default_regulated": false,
+  "categories": {
+    "cat-01": {
+      "canonical_category": "electronics",
+      "market_tags": ["consumer_electronics"],
+      "weather_enabled": false,
+      "sensitivity": "minimal",
+      "base_cap_pct": 1,
+      "k": 2,
+      "beta_pct_per_sd": null,
+      "lag_days": 0,
+      "default_windows": [],
+      "direction": "neutral",
+      "notes": "Weather is not a direct price driver; logistics disruption only as a warning."
+    },
+    "cat-02": {
+      "canonical_category": "textiles_fibers",
+      "market_tags": ["finished_textiles"],
+      "weather_enabled": false,
+      "sensitivity": "low",
+      "base_cap_pct": 3,
+      "k": 2,
+      "beta_pct_per_sd": null,
+      "lag_days": 30,
+      "default_windows": [],
+      "direction": "neutral",
+      "notes": "Raw fiber is weather sensitive; finished textiles less so. Enable only for fiber products with calibrated beta."
+    },
+    "cat-03": {
+      "canonical_category": "food_processing",
+      "market_tags": ["packaged_food"],
+      "weather_enabled": false,
+      "sensitivity": "low",
+      "base_cap_pct": 3,
+      "k": 2,
+      "beta_pct_per_sd": null,
+      "lag_days": 60,
+      "default_windows": [],
+      "direction": "neutral",
+      "notes": "Effects arrive via raw-material pass-through; beverages would use sale-region temperature with its own calibration."
+    },
+    "cat-04": {
+      "canonical_category": "construction_materials",
+      "market_tags": ["construction_demand", "industrial_input"],
+      "weather_enabled": true,
+      "sensitivity": "medium",
+      "base_cap_pct": 8,
+      "k": 2,
+      "beta_pct_per_sd": null,
+      "lag_days": 14,
+      "default_windows": ["building_season_onset", "building_season_end"],
+      "direction": "conditional",
+      "notes": "Rain shifts construction demand and deliveries; not a production shock. Direction depends on timing and stocks."
+    },
+    "cat-05": {
+      "canonical_category": "household_goods",
+      "market_tags": ["home"],
+      "weather_enabled": false,
+      "sensitivity": "low",
+      "base_cap_pct": 3,
+      "k": 2,
+      "beta_pct_per_sd": null,
+      "lag_days": 0,
+      "default_windows": [],
+      "direction": "neutral",
+      "notes": "Mostly trend and seasonality; indirect material effects only."
+    },
+    "cat-06": {
+      "canonical_category": "fresh_produce",
+      "market_tags": ["perishable", "food_processing"],
+      "weather_enabled": true,
+      "sensitivity": "very_high",
+      "base_cap_pct": 25,
+      "k": 2,
+      "beta_pct_per_sd": null,
+      "lag_days": 14,
+      "default_windows": ["flowering_frost", "heat_stress", "harvest_rain"],
+      "direction": "conditional",
+      "notes": "Origin weather, crop stage, irrigation and imports determine direction. Shocks pass through fast and fade fast."
+    }
+  }
+}

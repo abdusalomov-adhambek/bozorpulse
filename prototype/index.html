@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BozorPulse — AI Wholesale Intelligence</title>
+<style>
+:root{
+  --navy:#0b1324; --navy2:#111d36; --navy3:#182743;
+  --teal:#14b8a6; --teal-d:#0d9488; --indigo:#6366f1; --indigo-d:#4f46e5;
+  --bg:#f4f7fb; --card:#ffffff; --border:#e6ebf2; --border2:#eef2f7;
+  --text:#16243c; --muted:#6b7a90; --muted2:#94a3b8;
+  --green:#10b981; --red:#ef4444; --amber:#f59e0b;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.05);
+  --shadow-lg:0 12px 36px rgba(16,24,40,.10);
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--text); font-size:14px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.ico{width:18px;height:18px;flex:0 0 auto;display:block}
+
+/* ---------- Layout ---------- */
+.app{min-height:100vh;display:flex}
+.sidebar{
+  width:246px;flex:0 0 246px;background:linear-gradient(180deg,var(--navy) 0%,var(--navy2) 100%);
+  color:#cbd5e1;display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:40;
+  box-shadow:2px 0 20px rgba(8,15,30,.18);
+}
+.brand{display:flex;align-items:center;gap:11px;padding:24px 22px 20px}
+.brand-mark{
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--teal),var(--indigo));color:#fff;box-shadow:0 6px 16px rgba(20,184,166,.35)
+}
+.brand-mark svg{width:21px;height:21px}
+.brand-name{font-size:17px;font-weight:750;color:#fff;letter-spacing:-.3px}
+.brand-name span{color:var(--teal)}
+.brand-sub{font-size:10.5px;color:#7f90ab;letter-spacing:.6px;text-transform:uppercase;margin-top:1px}
+.nav{padding:6px 12px;flex:1;overflow-y:auto}
+.nav-label{font-size:10px;letter-spacing:1.4px;color:#5f7292;font-weight:700;padding:16px 12px 8px;text-transform:uppercase}
+.nav-item{
+  display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;color:#9fb0c9;
+  padding:11px 12px;border-radius:10px;text-align:left;font-weight:550;font-size:13.5px;
+  position:relative;transition:background .18s,color .18s,transform .12s;margin-bottom:3px
+}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-item:active{transform:scale(.985)}
+.nav-item.active{background:linear-gradient(90deg,rgba(20,184,166,.20),rgba(20,184,166,.05));color:#fff}
+.nav-item.active:before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:var(--teal)}
+.nav-item.active .ico{color:var(--teal)}
+.nav-badge{margin-left:auto;background:rgba(99,102,241,.32);color:#c7d2fe;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.sidebar-foot{padding:14px;border-top:1px solid rgba(255,255,255,.07)}
+.user-chip{display:flex;align-items:center;gap:10px;padding:8px;border-radius:11px;background:rgba(255,255,255,.05)}
+.avatar{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:12px;color:#fff;background:linear-gradient(135deg,#6366f1,#14b8a6);flex:0 0 auto}
+.user-chip .nm{font-size:12.5px;font-weight:650;color:#fff;line-height:1.2}
+.user-chip .rl{font-size:10.5px;color:#8ea0bd;text-transform:capitalize}
+
+.main{margin-left:246px;flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{
+  height:70px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:18px;padding:0 28px;position:sticky;top:0;z-index:30
+}
+.crumb{font-size:13px;color:var(--muted);white-space:nowrap}
+.crumb b{color:var(--text);font-weight:650}
+.crumb .sep{color:var(--muted2);margin:0 7px}
+.search-wrap{position:relative;margin-left:auto;width:min(360px,38vw)}
+.search-box{display:flex;align-items:center;gap:9px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:0 12px;height:40px;transition:border-color .18s,box-shadow .18s,background .18s}
+.search-box:focus-within{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,.12);background:#fff}
+.search-box .ico{color:var(--muted2);width:16px;height:16px}
+.search-box input{border:0;background:transparent;outline:0;flex:1;min-width:0;font-size:13px}
+.search-box input::placeholder{color:var(--muted2)}
+.kbd{font-size:10px;color:var(--muted2);border:1px solid var(--border);border-radius:5px;padding:1px 5px;background:#fff}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;color:var(--muted);position:relative;transition:background .18s,color .18s,transform .12s}
+.icon-btn:hover{background:var(--bg);color:var(--text)}
+.icon-btn:active{transform:scale(.94)}
+.dot{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--red);border:2px solid #fff}
+.role-switch{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px}
+.role-switch button{border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:650;padding:7px 13px;border-radius:7px;transition:all .18s}
+.role-switch button.on{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(16,24,40,.1)}
+.role-switch button:active{transform:scale(.96)}
+
+.search-results{position:absolute;top:46px;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow-lg);padding:8px;z-index:60;max-height:380px;overflow:auto}
+.sr-group{font-size:10px;font-weight:750;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;padding:8px 10px 5px}
+.sr-item{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;border-radius:9px;padding:9px 10px;text-align:left;transition:background .15s}
+.sr-item:hover{background:var(--bg)}
+.sr-ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:#eef2ff;color:var(--indigo);font-size:12px;font-weight:700;flex:0 0 auto}
+.sr-t{font-size:12.5px;font-weight:650;line-height:1.2}
+.sr-s{font-size:11px;color:var(--muted)}
+.sr-empty{padding:18px 10px;color:var(--muted);font-size:12.5px;text-align:center}
+
+.content{padding:26px 28px 48px;flex:1;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.page-title{font-size:25px;font-weight:760;letter-spacing:-.6px;margin:0}
+.page-sub{color:var(--muted);font-size:13px;margin:4px 0 0}
+.head-actions{display:flex;gap:10px;align-items:center}
+
+/* ---------- Generic UI ---------- */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 19px;border-bottom:1px solid var(--border2)}
+.card-title{font-size:14.5px;font-weight:700;margin:0;letter-spacing:-.2px}
+.card-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.card-b{padding:18px 19px}
+.grid{display:grid;gap:18px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+.cols-2{grid-template-columns:1.55fr 1fr}
+.cols-2b{grid-template-columns:1fr 1fr}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:20px;white-space:nowrap}
+.pill.teal{background:#e6faf6;color:var(--teal-d)}
+.pill.green{background:#e7f8f0;color:#047857}
+.pill.amber{background:#fff5e6;color:#b45309}
+.pill.red{background:#fdecec;color:#b91c1c}
+.pill.indigo{background:#eef0ff;color:var(--indigo-d)}
+.pill.gray{background:#f1f4f8;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid transparent;border-radius:9px;padding:9px 14px;font-size:12.5px;font-weight:650;transition:all .16s;white-space:nowrap}
+.btn .ico{width:15px;height:15px}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;box-shadow:0 5px 14px rgba(20,184,166,.28)}
+.btn-primary:hover{box-shadow:0 7px 18px rgba(20,184,166,.38);filter:brightness(1.04)}
+.btn-indigo{background:linear-gradient(135deg,var(--indigo),var(--indigo-d));color:#fff;box-shadow:0 5px 14px rgba(99,102,241,.26)}
+.btn-indigo:hover{filter:brightness(1.05)}
+.btn-ghost{background:#fff;border-color:var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--bg);border-color:#cfd8e6}
+.btn-sm{padding:6px 10px;font-size:11.5px;border-radius:8px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11.5px;font-weight:650;color:var(--muted)}
+.input,select.input,textarea.input{width:100%;border:1px solid var(--border);background:#fff;border-radius:9px;padding:10px 11px;font-size:13px;outline:0;transition:border-color .18s,box-shadow .18s}
+.input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,.12)}
+.input::placeholder{color:var(--muted2)}
+
+/* KPI card */
+.kpi{padding:17px 18px;position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s}
+.kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.kpi-ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center}
+.kpi-ic.teal{background:#e6faf6;color:var(--teal-d)}
+.kpi-ic.indigo{background:#eef0ff;color:var(--indigo-d)}
+.kpi-ic.amber{background:#fff5e6;color:#d97706}
+.kpi-ic.green{background:#e7f8f0;color:#059669}
+.delta{font-size:10.5px;font-weight:750;padding:3px 8px;border-radius:20px}
+.delta.up{background:#e7f8f0;color:#047857}
+.delta.down{background:#fdecec;color:#b91c1c}
+.kpi-val{font-size:27px;font-weight:770;letter-spacing:-.9px;line-height:1.1}
+.kpi-lbl{font-size:11.5px;color:var(--muted);margin-top:4px}
+
+/* list rows */
+.list-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border2)}
+.list-row:last-child{border-bottom:0}
+.rec-logo{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-weight:750;font-size:12px;color:#fff;flex:0 0 auto}
+.rec-main{flex:1;min-width:0}
+.rec-name{font-size:13px;font-weight:680;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-meta{font-size:11px;color:var(--muted);display:flex;gap:8px;align-items:center;margin-top:2px;flex-wrap:wrap}
+.rec-meta .sep{color:var(--border)}
+.stars{color:#f59e0b;font-size:11px}
+.verified{display:inline-flex;align-items:center;gap:3px;color:var(--teal-d);font-weight:700;font-size:10.5px}
+.verified svg{width:13px;height:13px}
+
+/* table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted2);font-weight:750;padding:10px 14px;border-bottom:1px solid var(--border);background:#fafbfd;white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--border2);white-space:nowrap}
+tbody tr{transition:background .14s}
+tbody tr:hover{background:#fafdff}
+tbody tr:last-child td{border-bottom:0}
+.status{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:20px}
+.status.in{background:#e7f8f0;color:#047857}
+.status.low{background:#fff5e6;color:#b45309}
+.status.out{background:#fdecec;color:#b91c1c}
+.mini-search{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:9px;padding:0 10px;height:36px;width:220px;background:#fff}
+.mini-search:focus-within{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,.1)}
+.mini-search .ico{width:15px;height:15px;color:var(--muted2)}
+.mini-search input{border:0;outline:0;background:transparent;width:100%;font-size:12.5px}
+
+/* insights */
+.insight{display:flex;gap:11px;padding:13px;border-radius:11px;background:var(--bg);margin-bottom:10px;border:1px solid transparent;transition:border-color .18s,transform .18s}
+.insight:hover{border-color:#cfe9e4;transform:translateX(2px)}
+.insight-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:0 0 auto;font-weight:800;font-size:14px}
+.insight-ic.up{background:#e7f8f0;color:#059669}
+.insight-ic.down{background:#fdecec;color:#dc2626}
+.insight-ic.geo{background:#eef0ff;color:var(--indigo)}
+.insight-t{font-size:12.5px;font-weight:700}
+.insight-d{font-size:11.5px;color:var(--muted);margin:2px 0 7px;line-height:1.45}
+
+/* matchmaking */
+.match-select{min-width:260px}
+.match-card{padding:17px 18px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;transition:box-shadow .18s,transform .18s;border:1px solid var(--border)}
+.match-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.ring{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;position:relative;flex:0 0 auto}
+.ring-in{width:59px;height:59px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center}
+.ring-num{font-size:19px;font-weight:800;letter-spacing:-.8px;line-height:1}
+.ring-pct{font-size:9px;color:var(--muted);font-weight:700}
+.rank{position:absolute;top:-6px;left:-6px;background:var(--navy);color:#fff;font-size:10px;font-weight:800;width:20px;height:20px;border-radius:50%;display:grid;place-items:center}
+.match-name{font-size:14px;font-weight:730;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.match-meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--muted)}
+.match-meta b{color:var(--text);font-weight:680}
+.match-stats{display:flex;gap:26px;text-align:right}
+.mstat .v{font-size:14.5px;font-weight:750;letter-spacing:-.3px}
+.mstat .l{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px}
+.why-btn{border:0;background:transparent;color:var(--indigo-d);font-size:11.5px;font-weight:700;padding:0;display:inline-flex;align-items:center;gap:4px;margin-top:10px}
+.why-btn .ico{width:13px;height:13px;transition:transform .2s}
+.why-btn.open .ico{transform:rotate(180deg)}
+.why-panel{margin-top:12px;padding:13px;background:#f8fafc;border-radius:10px;grid-column:1/-1;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;animation:fade .2s ease}
+.reason{display:flex;gap:8px;align-items:flex-start;font-size:11.5px}
+.reason ._dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex:0 0 auto}
+.reason.good ._dot{background:var(--green)}
+.reason.bad ._dot{background:#f59e0b}
+.reason .rl{font-weight:750;color:var(--text);display:block}
+.reason .rd{color:var(--muted)}
+.weights{display:flex;flex-direction:column;gap:10px}
+.weight-row{display:flex;align-items:center;gap:10px;font-size:11.5px}
+.weight-row .wl{width:112px;flex:0 0 auto;color:var(--muted)}
+.weight-bar{flex:1;height:7px;border-radius:6px;background:#eef2f7;overflow:hidden}
+.weight-bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--teal),var(--indigo))}
+.weight-row .wv{width:34px;text-align:right;font-weight:750;color:var(--text)}
+
+/* charts */
+.chart-svg{width:100%;height:auto;display:block;overflow:visible}
+.grid-line{stroke:#e9eef5;stroke-width:1}
+.axis-label{fill:#94a3b8;font-size:10px;font-family:inherit}
+.line-actual{fill:none;stroke:var(--teal);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.line-forecast{fill:none;stroke:var(--indigo);stroke-width:2.5;stroke-dasharray:7 6;stroke-linecap:round;stroke-linejoin:round}
+.dot-actual{fill:#fff;stroke:var(--teal);stroke-width:2.5}
+.dot-last{fill:var(--teal);stroke:#fff;stroke-width:2}
+.chart-legend{display:flex;gap:16px;font-size:11px;color:var(--muted);align-items:center;flex-wrap:wrap}
+.legend-line{width:18px;height:0;border-top:3px solid var(--teal);display:inline-block;margin-right:6px;vertical-align:middle;border-radius:3px}
+.legend-line.dash{border-top:2.5px dashed var(--indigo)}
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+.bar-label{width:118px;flex:0 0 auto;font-size:11.5px;font-weight:600;color:var(--text)}
+.bar-track{flex:1;height:22px;background:#f0f3f8;border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--teal),#5eead4);transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.bar-fill.alt{background:linear-gradient(90deg,var(--indigo),#a5b4fc)}
+.bar-val{width:30px;text-align:right;font-size:11.5px;font-weight:750}
+.trend-item{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border2)}
+.trend-item:last-child{border-bottom:0}
+.trend-ic{width:32px;height:32px;border-radius:9px;background:#eef2ff;color:var(--indigo);display:grid;place-items:center;font-size:11px;font-weight:800;flex:0 0 auto}
+.trend-name{font-size:12.5px;font-weight:650;flex:1;min-width:0}
+.trend-cat{font-size:10.5px;color:var(--muted)}
+.chg{font-size:12px;font-weight:750;display:flex;align-items:center;gap:3px}
+.chg.up{color:var(--green)}
+.chg.down{color:var(--red)}
+.forecast-note{background:linear-gradient(135deg,#f0fdfa,#eef2ff);border:1px solid #d9f2ec;border-radius:12px;padding:15px 17px;display:flex;gap:12px;align-items:flex-start}
+.forecast-note .ico{color:var(--teal-d);margin-top:1px}
+
+/* chat */
+.chat-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;height:calc(100vh - 210px);min-height:520px}
+.chat-card{display:flex;flex-direction:column;overflow:hidden}
+.chat-head{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px}
+.bot-av{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--indigo),var(--teal));color:#fff;flex:0 0 auto}
+.chat-head .t{font-size:13.5px;font-weight:720}
+.chat-head .s{font-size:11px;color:var(--green);display:flex;align-items:center;gap:5px}
+.chat-head .s:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green)}
+.chat-body{flex:1;overflow-y:auto;padding:20px 18px;background:#fbfcfe}
+.msg{display:flex;gap:10px;margin-bottom:18px;max-width:88%}
+.msg.user{margin-left:auto;flex-direction:row-reverse}
+.msg-av{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;font-size:11px;font-weight:750;flex:0 0 auto}
+.msg.user .msg-av{background:var(--navy3);color:#fff}
+.msg.bot .msg-av{background:#eef0ff;color:var(--indigo-d)}
+.bubble{padding:11px 14px;border-radius:13px;font-size:12.8px;line-height:1.55;white-space:pre-wrap}
+.msg.bot .bubble{background:#fff;border:1px solid var(--border);border-top-left-radius:3px;box-shadow:0 1px 2px rgba(16,24,40,.03)}
+.msg.user .bubble{background:linear-gradient(135deg,var(--indigo),var(--indigo-d));color:#fff;border-top-right-radius:3px}
+.msg-time{font-size:9.5px;color:var(--muted2);margin-top:5px}
+.msg.user .msg-time{text-align:right}
+.mini-table{margin-top:11px;border:1px solid var(--border);border-radius:9px;overflow:hidden;font-size:11px}
+.mini-table table{font-size:11px}
+.mini-table th{padding:7px 9px;font-size:9px;background:#f6f8fb}
+.mini-table td{padding:7px 9px;border-bottom:1px solid var(--border2)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.chip{border:1px solid #d9e2ef;background:#fff;color:var(--indigo-d);border-radius:20px;padding:6px 11px;font-size:11px;font-weight:650;transition:all .16s}
+.chip:hover{background:#eef0ff;border-color:#c7d2fe;transform:translateY(-1px)}
+.typing{display:flex;gap:4px;padding:13px 15px}
+.typing i{width:6px;height:6px;border-radius:50%;background:#a5b4fc;animation:bounce 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.18s}
+.typing i:nth-child(3){animation-delay:.36s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+.chat-input-bar{padding:13px 15px;border-top:1px solid var(--border);background:#fff;display:flex;gap:9px;align-items:center}
+.chat-input-bar input{flex:1;border:1px solid var(--border);border-radius:10px;padding:11px 13px;outline:0;font-size:13px;transition:border-color .18s,box-shadow .18s}
+.chat-input-bar input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,.1)}
+.send{width:42px;height:42px;border-radius:10px;border:0;background:linear-gradient(135deg,var(--indigo),var(--indigo-d));color:#fff;display:grid;place-items:center;transition:transform .14s,filter .18s;flex:0 0 auto}
+.send:hover{filter:brightness(1.08)}
+.send:active{transform:scale(.93)}
+.side-info{display:flex;flex-direction:column;gap:18px}
+.cap{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--border2)}
+.cap:last-child{border-bottom:0}
+.cap-ic{width:30px;height:30px;border-radius:9px;background:#eef2ff;color:var(--indigo-d);display:grid;place-items:center;flex:0 0 auto}
+.cap-t{font-size:12px;font-weight:680}
+.cap-d{font-size:10.8px;color:var(--muted);line-height:1.4;margin-top:2px}
+
+/* toast */
+.toast-wrap{position:fixed;right:22px;bottom:22px;z-index:100;display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--navy);color:#fff;border-radius:11px;padding:12px 15px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-lg);font-size:12.5px;font-weight:600;min-width:230px;max-width:340px}
+.toast .tico{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;flex:0 0 auto}
+.toast.success .tico{background:rgba(16,185,129,.25);color:#6ee7b7}
+.toast.info .tico{background:rgba(99,102,241,.3);color:#c7d2fe}
+.toast.warn .tico{background:rgba(245,158,11,.25);color:#fcd34d}
+.toast-close{margin-left:auto;border:0;background:transparent;color:#94a3b8;font-size:16px;line-height:1;padding:0}
+.toast-enter-active,.toast-leave-active{transition:all .3s cubic-bezier(.2,.8,.2,1)}
+.toast-enter-from,.toast-leave-to{opacity:0;transform:translateX(30px)}
+
+.muted{color:var(--muted)}
+.right{margin-left:auto}
+.mono{font-variant-numeric:tabular-nums}
+.mini-hint{font-size:11px;color:var(--muted2)}
+
+@media(max-width:1100px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .cols-2,.cols-2b{grid-template-columns:1fr}
+  .chat-layout{grid-template-columns:1fr;height:auto}
+  .chat-card{height:560px}
+  .side-info{flex-direction:row;flex-wrap:wrap}
+  .side-info .card{flex:1;min-width:240px}
+}
+@media(max-width:820px){
+  .sidebar{width:70px;flex-basis:70px}
+  .brand{padding:20px 16px}
+  .brand-name,.brand-sub,.nav-label,.nav-item span,.nav-badge,.user-chip .nm,.user-chip .rl{display:none}
+  .nav-item{justify-content:center;padding:12px}
+  .user-chip{justify-content:center;padding:6px}
+  .main{margin-left:70px}
+  .topbar{padding:0 16px;gap:10px}
+  .crumb{display:none}
+  .search-wrap{margin-left:0;width:auto;flex:1}
+  .kbd,.role-switch button{font-size:11px;padding:6px 9px}
+  .content{padding:20px 16px 40px}
+  .match-stats{gap:14px}
+  .why-panel{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="app">
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Bozor<span>Pulse</span></div>
+          <div class="brand-sub">AI Marketplace</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-label">Workspace</div>
+        <button v-for="n in navMain" :key="n.id" class="nav-item" :class="{active:currentView===n.id}" @click="navigate(n.id)">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path :d="n.icon"/></svg>
+          <span>{{n.label}}</span>
+          <span v-if="n.badge" class="nav-badge">{{n.badge}}</span>
+        </button>
+        <div class="nav-label">Intelligence</div>
+        <button v-for="n in navIntel" :key="n.id" class="nav-item" :class="{active:currentView===n.id}" @click="navigate(n.id)">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path :d="n.icon"/></svg>
+          <span>{{n.label}}</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="user-chip">
+          <div class="avatar">{{role==='Buyer'?'AK':'ST'}}</div>
+          <div>
+            <div class="nm">{{role==='Buyer'?'Aisha Karim':'Silk Road Textiles'}}</div>
+            <div class="rl">{{role}} account</div>
+          </div>
+          <button class="icon-btn right" style="width:28px;height:28px;border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#9fb0c9" @click="showToast('Account settings opened','info')" title="Account">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1-2.8 2.8-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21h-4v-.2a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1L4.2 17l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H3v-4h.2a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8L4.2 7 7 4.2l.1.1a1.6 1.6 0 001.8.3 1.6 1.6 0 001-1.5V3h4v.2a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1L19.8 7l-.1.1a1.6 1.6 0 00-.3 1.8 1.6 1.6 0 001.5 1H21v4h-.2a1.6 1.6 0 00-1.4 1z"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <div class="main">
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <div class="crumb">Workspace <span class="sep">/</span> <b>{{currentTitle}}</b></div>
+
+        <div class="search-wrap">
+          <div class="search-box">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+            <input v-model="globalSearch" @focus="searchFocused=true" placeholder="Search suppliers or products…" aria-label="Global search">
+            <span class="kbd" v-if="!globalSearch">⌘ K</span>
+            <button v-else @click="globalSearch=''" style="border:0;background:transparent;color:var(--muted2);font-size:16px;line-height:1;padding:0">×</button>
+          </div>
+          <div class="search-results" v-if="globalSearch && searchFocused">
+            <template v-if="globalResults.suppliers.length || globalResults.products.length">
+              <div class="sr-group">Suppliers</div>
+              <button class="sr-item" v-for="s in globalResults.suppliers" :key="'s'+s.id" @click="pickSupplier(s)">
+                <div class="sr-ic" :style="{background:colorFor(s.name)+'22',color:colorFor(s.name)}">{{initials(s.name)}}</div>
+                <div><div class="sr-t">{{s.name}}</div><div class="sr-s">{{s.category}} · {{s.city}}, {{s.country}}</div></div>
+                <span class="pill teal right">{{s.rating}} ★</span>
+              </button>
+              <div class="sr-group">Products</div>
+              <button class="sr-item" v-for="p in globalResults.products" :key="'p'+p.id" @click="pickProduct(p)">
+                <div class="sr-ic" style="background:#e6faf6;color:var(--teal-d)">◈</div>
+                <div><div class="sr-t">{{p.name}}</div><div class="sr-s">{{p.category}} · ${{p.price}}/{{p.unit}}</div></div>
+              </button>
+            </template>
+            <div class="sr-empty" v-else>No matches for “{{globalSearch}}”</div>
+          </div>
+        </div>
+
+        <div class="role-switch">
+          <button v-for="r in ['Buyer','Supplier']" :key="r" :class="{on:role===r}" @click="switchRole(r)">{{r}}</button>
+        </div>
+        <button class="icon-btn" @click="showToast('You have 3 unread insights','info')" title="Notifications">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 00-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9zM10 21h4"/></svg>
+          <span class="dot"></span>
+        </button>
+        <button class="avatar" style="border:0" @click="showToast('Signed in as '+role,'info')" title="Profile">{{role==='Buyer'?'AK':'ST'}}</button>
+      </header>
+
+      <!-- ================= VIEW: BUYER DASHBOARD ================= -->
+      <main class="content" v-if="currentView==='buyer'">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Buyer Dashboard</h1>
+            <p class="page-sub">Your sourcing command center — powered by market intelligence.</p>
+          </div>
+          <div class="head-actions">
+            <button class="btn btn-ghost" @click="navigate('pulse')">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg> Market Pulse
+            </button>
+            <button class="btn btn-primary" @click="focusRfqForm">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Create RFQ
+            </button>
+          </div>
+        </div>
+
+        <div class="grid kpis" style="margin-bottom:18px">
+          <div class="card kpi">
+            <div class="kpi-top"><div class="kpi-ic indigo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M8 13h8M8 17h6"/></svg></div><span class="delta up">+2 this week</span></div>
+            <div class="kpi-val">{{rfqs.length}}</div><div class="kpi-lbl">Active RFQs</div>
+          </div>
+          <div class="card kpi">
+            <div class="kpi-top"><div class="kpi-ic teal"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></div><span class="delta up">{{verifiedCount}} verified</span></div>
+            <div class="kpi-val">{{suppliers.length}}</div><div class="kpi-lbl">Suppliers available</div>
+          </div>
+          <div class="card kpi">
+            <div class="kpi-top"><div class="kpi-ic amber"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><span class="delta up">Top-tier</span></div>
+            <div class="kpi-val">{{avgMatch}}%</div><div class="kpi-lbl">Avg. match score</div>
+          </div>
+          <div class="card kpi">
+            <div class="kpi-top"><div class="kpi-ic green"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8M17 7h4v4"/></svg></div><span class="delta up">+6.2% MoM</span></div>
+            <div class="kpi-val mono">{{marketPulse}}</div><div class="kpi-lbl">Market pulse index</div>
+          </div>
+        </div>
+
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="card-h">
+              <div><h3 class="card-title">Recommended for you</h3><div class="card-sub">Ranked by AI for your active RFQ</div></div>
+              <button class="btn btn-ghost btn-sm" @click="goMatchingForFirst">View all <span>→</span></button>
+            </div>
+            <div class="card-b" style="padding-top:6px;padding-bottom:8px">
+              <div class="list-row" v-for="m in recommendations" :key="m.supplier.id">
+                <div class="rec-logo" :style="{background:colorFor(m.supplier.name)}">{{initials(m.supplier.name)}}</div>
+                <div class="rec-main">
+                  <div class="rec-name">{{m.supplier.name}}
+                    <span v-if="m.supplier.verified" class="verified" style="margin-left:4px">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Verified
+                    </span>
+                  </div>
+                  <div class="rec-meta">
+                    <span>{{m.supplier.category}}</span><span class="sep">·</span>
+                    <span>{{m.supplier.city}}, {{m.supplier.country}}</span><span class="sep">·</span>
+                    <span class="stars">★ {{m.supplier.rating}}</span>
+                  </div>
+                </div>
+                <span class="pill teal">{{m.score}}% match</span>
+                <button class="btn btn-ghost btn-sm" @click="viewSupplierMatch(m.supplier)">Match</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="rfq-form-card">
+            <div class="card-h">
+              <div><h3 class="card-title">Create an RFQ</h3><div class="card-sub">Tell us what you need — AI does the rest</div></div>
+              <span class="pill indigo">AI powered</span>
+            </div>
+            <div class="card-b">
+              <form @submit.prevent="submitRfq">
+                <div class="grid cols-2b" style="gap:13px">
+                  <div class="field"><label>Product name</label><input class="input" v-model="rfqForm.productName" placeholder="e.g. Cotton Jersey" required></div>
+                  <div class="field"><label>Category</label><select class="input" v-model="rfqForm.category" required><option value="" disabled>Select…</option><option v-for="c in categories" :key="c">{{c}}</option></select></div>
+                  <div class="field"><label>Quantity</label><input class="input" type="number" min="1" v-model="rfqForm.quantity" placeholder="1000" required></div>
+                  <div class="field"><label>Target price / unit ($)</label><input class="input" type="number" min="0" step="0.01" v-model="rfqForm.targetPrice" placeholder="7.00" required></div>
+                  <div class="field" style="grid-column:1/-1"><label>Delivery city</label><select class="input" v-model="rfqForm.city" required><option value="" disabled>Select city…</option><option v-for="c in cityList" :key="c">{{c}}</option></select></div>
+                </div>
+                <div style="display:flex;gap:9px;margin-top:16px">
+                  <button class="btn btn-primary right" type="submit" style="flex:1">
+                    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg>
+                    Find AI matches
+                  </button>
+                  <button class="btn btn-ghost" type="button" @click="resetRfqForm">Reset</button>
+                </div>
+              </form>
+              <div class="mini-hint" style="margin-top:10px">Scoring uses 7 weighted signals including price fit, rating and geo proximity.</div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ================= VIEW: SUPPLIER WORKSPACE ================= -->
+      <main class="content" v-if="currentView==='supplier'">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Supplier Workspace</h1>
+            <p class="page-sub">Manage your catalog and act on AI-driven demand signals.</p>
+          </div>
+          <div class="head-actions">
+            <button class="btn btn-ghost" @click="showToast('Catalog export queued','info')">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> Export
+            </button>
+            <button class="btn btn-primary" @click="showToast('New product draft created','success')">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add product
+            </button>
+          </div>
+        </div>
+
+        <div class="grid kpis" style="margin-bottom:18px">
+          <div class="card kpi"><div class="kpi-top"><div class="kpi-ic teal"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M20 7l-8-4-8 4 8 4 8-4zM4 7v10l8 4 8-4V7M12 11v10"/></svg></div><span class="delta up">+3 this month</span></div><div class="kpi-val">{{myProducts.length}}</div><div class="kpi-lbl">Products listed</div></div>
+          <div class="card kpi"><div class="kpi-top"><div class="kpi-ic indigo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div><span class="delta up">+18%</span></div><div class="kpi-val mono">1,284</div><div class="kpi-lbl">Profile views</div></div>
+          <div class="card kpi"><div class="kpi-top"><div class="kpi-ic amber"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="delta up">4 new</span></div><div class="kpi-val">{{relevantInquiries}}</div><div class="kpi-lbl">Inquiries received</div></div>
+          <div class="card kpi"><div class="kpi-top"><div class="kpi-ic green"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><span class="delta up">Excellent</span></div><div class="kpi-val">{{mySupplier.responseRate}}%</div><div class="kpi-lbl">Response rate</div></div>
+        </div>
+
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="card-h">
+              <div><h3 class="card-title">Product catalog</h3><div class="card-sub">Your live listings on BozorPulse</div></div>
+              <div class="mini-search"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input v-model="productSearch" placeholder="Search products…"></div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>MOQ</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                  <tr v-for="p in filteredCatalog" :key="p.id">
+                    <td style="font-weight:650">{{p.name}}</td>
+                    <td class="muted">{{p.category}}</td>
+                    <td class="mono">${{p.price.toFixed(2)}}<span class="muted">/{{p.unit}}</span></td>
+                    <td class="mono">{{p.stock.toLocaleString()}}</td>
+                    <td class="mono">{{p.minOrder}}</td>
+                    <td><span class="status" :class="stockStatus(p)">{{stockLabel(p)}}</span></td>
+                    <td><button class="btn btn-ghost btn-sm" @click="showToast('Editing '+p.name,'info')">Edit</button></td>
+                  </tr>
+                  <tr v-if="!filteredCatalog.length"><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No products match “{{productSearch}}”</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><div><h3 class="card-title">Your AI insights</h3><div class="card-sub">Fresh signals from the market engine</div></div><span class="pill teal">3 new</span></div>
+            <div class="card-b">
+              <div class="insight" v-for="(ins,i) in insights" :key="i">
+                <div class="insight-ic" :class="ins.kind">{{ins.sym}}</div>
+                <div style="flex:1">
+                  <div class="insight-t">{{ins.title}}</div>
+                  <div class="insight-d">{{ins.desc}}</div>
+                  <button class="btn btn-ghost btn-sm" @click="ins.action()">{{ins.cta}} →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ================= VIEW: AI MATCHMAKING ================= -->
+      <main class="content" v-if="currentView==='match'">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">AI Matchmaking</h1>
+            <p class="page-sub">Suppliers ranked by a transparent 7-factor scoring model.</p>
+          </div>
+          <div class="head-actions">
+            <span class="mini-hint">Select RFQ</span>
+            <select class="input match-select" v-model="selectedRfqId" @change="onRfqChange">
+              <option v-for="r in rfqs" :key="r.id" :value="r.id">#{{r.id}} · {{r.productName}} · {{r.quantity}} units</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid" style="grid-template-columns:1fr 300px;align-items:start">
+          <div>
+            <div class="card" style="margin-bottom:14px;background:linear-gradient(135deg,#0f766e,#4338ca);border:0;color:#fff">
+              <div class="card-b" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <div style="width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:0 0 auto">
+                  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg>
+                </div>
+                <div style="flex:1;min-width:180px">
+                  <div style="font-size:11px;opacity:.8;text-transform:uppercase;letter-spacing:1px;font-weight:700">Active request</div>
+                  <div style="font-size:16px;font-weight:750">{{selectedRfq.productName}} · {{selectedRfq.category}}</div>
+                  <div style="font-size:11.5px;opacity:.85;margin-top:3px">{{selectedRfq.quantity.toLocaleString()}} units · target ${{Number(selectedRfq.targetPrice).toFixed(2)}}/unit · deliver to {{selectedRfq.city}}</div>
+                </div>
+                <div style="text-align:right"><div style="font-size:22px;font-weight:800">{{matches.length}}</div><div style="font-size:10.5px;opacity:.8">suppliers scored</div></div>
+              </div>
+            </div>
+
+            <div class="card match-card" v-for="(m,i) in matches" :key="m.supplier.id">
+              <div class="ring" :style="{background:'conic-gradient('+ringColor(m.score)+' '+m.score+'%, #e9eef5 0)'}">
+                <span class="rank" v-if="i<3">{{i+1}}</span>
+                <div class="ring-in"><div><div class="ring-num">{{m.score}}</div><div class="ring-pct">MATCH</div></div></div>
+              </div>
+              <div>
+                <div class="match-name">{{m.supplier.name}}
+                  <span v-if="m.supplier.verified" class="verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Verified</span>
+                </div>
+                <div class="match-meta">
+                  <span>{{m.supplier.category}}</span>
+                  <span>Near {{m.supplier.city}}, {{m.supplier.country}}</span>
+                  <span class="stars">★ {{m.supplier.rating}}</span>
+                  <span>{{m.supplier.responseRate}}% response</span>
+                </div>
+                <button class="why-btn" :class="{open:expanded[m.supplier.id]}" @click="toggleReason(m.supplier.id)">
+                  Why matched?
+                  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="why-panel" v-if="expanded[m.supplier.id]">
+                  <div class="reason" :class="r.good?'good':'bad'" v-for="r in m.reasons" :key="r.label">
+                    <span class="_dot"></span>
+                    <div><span class="rl">{{r.label}}</span><span class="rd"> — {{r.text}}</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="match-stats">
+                <div class="mstat"><div class="v mono">${{m.price.toFixed(2)}}</div><div class="l">Unit price</div></div>
+                <div class="mstat"><div class="v">{{m.supplier.leadTimeDays}}d</div><div class="l">Lead time</div></div>
+                <div class="mstat"><div class="v mono">${{m.total.toLocaleString(undefined,{maximumFractionDigits:0})}}</div><div class="l">Est. total</div></div>
+                <button class="btn btn-primary btn-sm" style="align-self:center" @click="showToast('Quote request sent to '+m.supplier.name,'success')">Request quote</button>
+              </div>
+            </div>
+            <div class="card" v-if="!matches.length" style="padding:30px;text-align:center;color:var(--muted)">No suppliers match this request yet. Try a different category.</div>
+          </div>
+
+          <div class="card" style="position:sticky;top:88px">
+            <div class="card-h"><div><h3 class="card-title">Match score weights</h3><div class="card-sub">How the AI ranks suppliers</div></div></div>
+            <div class="card-b weights">
+              <div class="weight-row" v-for="w in weights" :key="w.label">
+                <span class="wl">{{w.label}}</span>
+                <span class="weight-bar"><i :style="{width:(w.value/25*100)+'%'}"></i></span>
+                <span class="wv">{{w.value}}%</span>
+              </div>
+              <div class="mini-hint" style="margin-top:4px;border-top:1px solid var(--border2);padding-top:12px">Scores are normalized per request and recomputed instantly when you switch RFQs.</div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ================= VIEW: MARKET PULSE ================= -->
+      <main class="content" v-if="currentView==='pulse'">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Market Pulse</h1>
+            <p class="page-sub">Live price indices, demand signals and 90-day forecasts.</p>
+          </div>
+          <div class="head-actions">
+            <select class="input" style="min-width:220px" v-model="selectedChartProduct">
+              <option v-for="p in products" :key="p.id" :value="p.id">{{p.name}}</option>
+            </select>
+            <button class="btn btn-ghost" @click="showForecast=!showForecast">{{showForecast?'Hide':'Show'}} forecast</button>
+          </div>
+        </div>
+
+        <div class="grid" style="grid-template-columns:1.6fr 1fr;align-items:start">
+          <div class="card">
+            <div class="card-h">
+              <div><h3 class="card-title">Price index — {{chartProduct.name}}</h3><div class="card-sub">Indexed to 100 at start · last 12 months + forecast</div></div>
+              <span class="pill" :class="indexChange>=0?'green':'red'">{{indexChange>=0?'↑':'↓'}} {{Math.abs(indexChange).toFixed(1)}}%</span>
+            </div>
+            <div class="card-b">
+              <svg class="chart-svg" :viewBox="'0 0 '+priceChart.W+' '+priceChart.H" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.28"/>
+                    <stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <g v-for="(g,i) in priceChart.grid" :key="i">
+                  <line class="grid-line" :x1="priceChart.padL" :x2="priceChart.W-14" :y1="g.y" :y2="g.y"/>
+                  <text class="axis-label" :x="priceChart.padL-9" :y="g.y+3.5" text-anchor="end">{{g.label}}</text>
+                </g>
+                <path :d="priceChart.area" fill="url(#areaGrad)"/>
+                <polyline class="line-actual" :points="priceChart.line"/>
+                <polyline v-if="showForecast" class="line-forecast" :points="priceChart.forecastLine"/>
+                <circle v-for="(d,i) in priceChart.dots" :key="'d'+i" class="dot-actual" :cx="d.x" :cy="d.y" r="3.2"/>
+                <circle v-if="priceChart.dots.length" class="dot-last" :cx="priceChart.dots[priceChart.dots.length-1].x" :cy="priceChart.dots[priceChart.dots.length-1].y" r="5"/>
+                <text v-for="(x,i) in priceChart.xLabels" :key="'x'+i" class="axis-label" :x="x.x" :y="priceChart.H-8" text-anchor="middle">{{x.m}}</text>
+              </svg>
+              <div class="chart-legend" style="margin-top:10px">
+                <span><i class="legend-line"></i>Actual index</span>
+                <span v-if="showForecast"><i class="legend-line dash"></i>AI forecast</span>
+                <span class="mini-hint right">Source: aggregated transaction data</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><div><h3 class="card-title">Demand by category</h3><div class="card-sub">Buyer interest score (0–100)</div></div></div>
+            <div class="card-b">
+              <div class="bar-row" v-for="(score,cat) in demandScores" :key="cat">
+                <span class="bar-label">{{cat}}</span>
+                <span class="bar-track"><span class="bar-fill" :class="{alt:score<75}" :style="{width:score+'%'}"></span></span>
+                <span class="bar-val">{{score}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid cols-2b" style="margin-top:18px">
+          <div class="card">
+            <div class="card-h"><div><h3 class="card-title">Trending products</h3><div class="card-sub">Price movement across all listings</div></div></div>
+            <div class="card-b" style="padding-top:6px;padding-bottom:8px">
+              <button class="trend-item" style="width:100%;border:0;background:transparent;text-align:left" v-for="t in trending" :key="t.name" @click="pickTrending(t)">
+                <span class="trend-ic">{{initials(t.name)}}</span>
+                <span class="trend-name">{{t.name}}<div class="trend-cat">{{t.category}}</div></span>
+                <span class="chg" :class="t.change>=0?'up':'down'">{{t.change>=0?'↑':'↓'}} {{Math.abs(t.change).toFixed(1)}}%</span>
+              </button>
+            </div>
+          </div>
+          <div>
+            <div class="forecast-note">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg>
+              <div>
+                <div style="font-weight:750;font-size:13px">Demand forecast</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55">
+                  Textiles and Electronics are set to lead demand over the next 90 days, with a projected <b>+8.4%</b> price index rise. Construction inputs look stable. Consider locking in supplier contracts for high-velocity SKUs before seasonal demand peaks.
+                </div>
+                <button class="btn btn-ghost btn-sm" style="margin-top:10px" @click="navigate('assistant')">Ask the AI assistant →</button>
+              </div>
+            </div>
+            <div class="card" style="margin-top:14px;padding:15px 17px">
+              <div style="font-size:12.5px;font-weight:700;margin-bottom:6px">How to read this chart</div>
+              <div style="font-size:11.5px;color:var(--muted);line-height:1.55">The solid teal line is the observed price index. The dashed indigo segment is the model's forward projection, blending momentum, seasonality and regional demand signals.</div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ================= VIEW: AI ASSISTANT ================= -->
+      <main class="content" v-if="currentView==='assistant'">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">AI Assistant</h1>
+            <p class="page-sub">Ask anything about suppliers, prices, RFQs or market trends.</p>
+          </div>
+          <button class="btn btn-ghost" @click="clearChat">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Clear chat
+          </button>
+        </div>
+
+        <div class="chat-layout">
+          <div class="card chat-card">
+            <div class="chat-head">
+              <div class="bot-av"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg></div>
+              <div><div class="t">Pulse Assistant</div><div class="s">Online · understands your marketplace</div></div>
+            </div>
+            <div class="chat-body" ref="chatBody">
+              <div class="msg" :class="m.from" v-for="m in messages" :key="m.id">
+                <div class="msg-av">{{m.from==='bot'?'AI':'AK'}}</div>
+                <div>
+                  <div class="bubble">{{m.text}}</div>
+                  <div class="mini-table" v-if="m.table">
+                    <table>
+                      <thead><tr><th v-for="h in m.table.headers" :key="h">{{h}}</th></tr></thead>
+                      <tbody><tr v-for="(row,ri) in m.table.rows" :key="ri"><td v-for="(cell,ci) in row" :key="ci">{{cell}}</td></tr></tbody>
+                    </table>
+                  </div>
+                  <div class="chips" v-if="m.chips && m.chips.length">
+                    <button class="chip" v-for="c in m.chips" :key="c" @click="sendMessage(c)">{{c}}</button>
+                  </div>
+                  <div class="msg-time">{{m.time}}</div>
+                </div>
+              </div>
+              <div class="msg bot" v-if="typing">
+                <div class="msg-av">AI</div>
+                <div class="bubble" style="padding:6px 8px"><div class="typing"><i></i><i></i><i></i></div></div>
+              </div>
+            </div>
+            <div class="chat-input-bar">
+              <input v-model="chatInput" @keyup.enter="sendMessage()" placeholder="Ask about suppliers, prices, trends…" aria-label="Message">
+              <button class="send" @click="sendMessage()" title="Send">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="side-info">
+            <div class="card">
+              <div class="card-h"><div><h3 class="card-title">What I can do</h3></div></div>
+              <div class="card-b" style="padding-top:6px;padding-bottom:8px">
+                <div class="cap" v-for="c in capabilities" :key="c.t">
+                  <div class="cap-ic"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path :d="c.icon"/></svg></div>
+                  <div><div class="cap-t">{{c.t}}</div><div class="cap-d">{{c.d}}</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><div><h3 class="card-title">Try asking</h3></div></div>
+              <div class="card-b" style="display:flex;flex-direction:column;gap:8px">
+                <button class="chip" style="text-align:left" v-for="q in starterQuestions" :key="q" @click="sendMessage(q)">{{q}}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div class="toast-wrap">
+    <transition-group name="toast">
+      <div class="toast" :class="t.type" v-for="t in toasts" :key="t.id">
+        <span class="tico">
+          <svg v-if="t.type==='success'" class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <svg v-else class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg>
+        </span>
+        <span>{{t.message}}</span>
+        <button class="toast-close" @click="dismissToast(t.id)">×</button>
+      </div>
+    </transition-group>
+  </div>
+</div>
+
+<script src="./vendor/vue.global.prod.js"></script>
+<script>
+(function(){
+  const { createApp, ref, reactive, computed, nextTick } = Vue;
+
+  /* ================= CONSTANTS ================= */
+  const CATEGORIES = ['Electronics','Textiles','Food & Beverage','Construction','Home & Kitchen','Agriculture'];
+  const CITY_COORDS = {
+    'Tashkent':[41.30,69.24], 'Istanbul':[41.01,28.98], 'Dubai':[25.20,55.27],
+    'Almaty':[43.24,76.89], 'Shanghai':[31.23,121.47], 'Delhi':[28.61,77.21]
+  };
+  const CITY_LIST = Object.keys(CITY_COORDS);
+  const CAT_KEYWORDS = {
+    'Electronics':['electronic','sensor','circuit','microcontroller','smart plug','led','module','chip','semiconductor'],
+    'Textiles':['textile','fabric','cotton','denim','linen','yarn','cloth','garment'],
+    'Food & Beverage':['food','beverage','rice','coffee','spice','grain','wheat','tea'],
+    'Construction':['construction','cement','steel','rebar','build','material','concrete'],
+    'Home & Kitchen':['home','kitchen','cookware','dinner','ceramic','furniture','utensil'],
+    'Agriculture':['agriculture','agri','farm','crop','fertilizer','produce','harvest']
+  };
+  const WEIGHTS = [
+    {label:'Price fit',value:25},{label:'Rating',value:15},{label:'Response rate',value:15},
+    {label:'Lead time',value:15},{label:'Verification',value:10},{label:'Geo proximity',value:10},{label:'Stock',value:10}
+  ];
+  const W = {price:.25,rating:.15,response:.15,lead:.15,verified:.10,geo:.10,stock:.10};
+
+  const ICONS = {
+    dash:'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+    supplier:'M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6',
+    match:'M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1M12 8a4 4 0 100 8 4 4 0 000-8z',
+    pulse:'M3 12h4l3-8 4 16 3-8h4',
+    bot:'M12 3a6 6 0 00-6 6c0 2.2 1.2 4.1 3 5.2V17h6v-2.8c1.8-1.1 3-3 3-5.2a6 6 0 00-6-6zM9 20h6M9 9h.01M15 9h.01'
+  };
+
+  /* ================= SEED DATA ================= */
+  const suppliersSeed = [
+    {id:1,name:'Silk Road Textiles',category:'Textiles',city:'Tashkent',country:'Uzbekistan',rating:4.8,verified:true,responseRate:96,minOrder:200,leadTimeDays:7,productsCount:6},
+    {id:2,name:'Anatolia Fabrics',category:'Textiles',city:'Istanbul',country:'Turkey',rating:4.6,verified:true,responseRate:91,minOrder:300,leadTimeDays:9,productsCount:5},
+    {id:3,name:'Delta Electronics',category:'Electronics',city:'Dubai',country:'UAE',rating:4.7,verified:true,responseRate:94,minOrder:50,leadTimeDays:5,productsCount:8},
+    {id:4,name:'Almaty Components',category:'Electronics',city:'Almaty',country:'Kazakhstan',rating:4.3,verified:false,responseRate:82,minOrder:100,leadTimeDays:12,productsCount:4},
+    {id:5,name:'Shanghai Circuits',category:'Electronics',city:'Shanghai',country:'China',rating:4.9,verified:true,responseRate:98,minOrder:500,leadTimeDays:14,productsCount:11},
+    {id:6,name:'Delhi Spice House',category:'Food & Beverage',city:'Delhi',country:'India',rating:4.5,verified:true,responseRate:88,minOrder:250,leadTimeDays:10,productsCount:7},
+    {id:7,name:'Gulf Food Traders',category:'Food & Beverage',city:'Dubai',country:'UAE',rating:4.4,verified:true,responseRate:90,minOrder:150,leadTimeDays:8,productsCount:9},
+    {id:8,name:'Pacific Build Mart',category:'Construction',city:'Shanghai',country:'China',rating:4.2,verified:false,responseRate:78,minOrder:1000,leadTimeDays:21,productsCount:6},
+    {id:9,name:'Tashkent Cement Co.',category:'Construction',city:'Tashkent',country:'Uzbekistan',rating:4.6,verified:true,responseRate:93,minOrder:800,leadTimeDays:6,productsCount:5},
+    {id:10,name:'HomeLine Istanbul',category:'Home & Kitchen',city:'Istanbul',country:'Turkey',rating:4.7,verified:true,responseRate:95,minOrder:120,leadTimeDays:11,productsCount:8},
+    {id:11,name:'Kitchen Pro Delhi',category:'Home & Kitchen',city:'Delhi',country:'India',rating:4.1,verified:false,responseRate:80,minOrder:80,leadTimeDays:13,productsCount:6},
+    {id:12,name:'Fertile Fields',category:'Agriculture',city:'Almaty',country:'Kazakhstan',rating:4.8,verified:true,responseRate:97,minOrder:400,leadTimeDays:4,productsCount:10}
+  ];
+  const productsSeed = [
+    {id:1,name:'Cotton Jersey Fabric',category:'Textiles',supplierId:1,price:6.80,unit:'kg',stock:4800,minOrder:200},
+    {id:2,name:'Yarn Blend 40s',category:'Textiles',supplierId:1,price:5.60,unit:'kg',stock:6200,minOrder:200},
+    {id:3,name:'Organic Denim',category:'Textiles',supplierId:2,price:9.40,unit:'m',stock:3200,minOrder:300},
+    {id:4,name:'Linen Tablecloth',category:'Textiles',supplierId:2,price:11.20,unit:'pc',stock:2100,minOrder:150},
+    {id:5,name:'Wireless Sensor Module',category:'Electronics',supplierId:3,price:12.50,unit:'pc',stock:1500,minOrder:50},
+    {id:6,name:'Smart Plug',category:'Electronics',supplierId:3,price:8.75,unit:'pc',stock:4200,minOrder:100},
+    {id:7,name:'LED Driver Board',category:'Electronics',supplierId:4,price:4.20,unit:'pc',stock:2600,minOrder:100},
+    {id:8,name:'Microcontroller Kit',category:'Electronics',supplierId:5,price:7.90,unit:'pc',stock:9000,minOrder:500},
+    {id:9,name:'Basmati Rice',category:'Food & Beverage',supplierId:6,price:2.10,unit:'kg',stock:12000,minOrder:250},
+    {id:10,name:'Arabic Coffee Blend',category:'Food & Beverage',supplierId:7,price:14.00,unit:'kg',stock:3400,minOrder:150},
+    {id:11,name:'Steel Rebar 12mm',category:'Construction',supplierId:8,price:0.95,unit:'kg',stock:50000,minOrder:1000},
+    {id:12,name:'Portland Cement',category:'Construction',supplierId:9,price:0.42,unit:'kg',stock:80000,minOrder:800},
+    {id:13,name:'Ceramic Dinner Set',category:'Home & Kitchen',supplierId:10,price:18.50,unit:'set',stock:1800,minOrder:120},
+    {id:14,name:'Stainless Cookware',category:'Home & Kitchen',supplierId:11,price:24.00,unit:'set',stock:950,minOrder:80},
+    {id:15,name:'Wheat Grain',category:'Agriculture',supplierId:12,price:0.31,unit:'kg',stock:60000,minOrder:400},
+    {id:16,name:'Cotton Poplin',category:'Textiles',supplierId:1,price:7.40,unit:'m',stock:5400,minOrder:200},
+    {id:17,name:'Organic Muslin',category:'Textiles',supplierId:1,price:8.20,unit:'m',stock:3100,minOrder:150}
+  ];
+  const buyersSeed = [
+    {id:1,name:'Aisha Karim',company:'Karim Trading',city:'Tashkent',country:'Uzbekistan',rfqs:8,spend:120000},
+    {id:2,name:'Mehmet Yilmaz',company:'Yilmaz Group',city:'Istanbul',country:'Turkey',rfqs:5,spend:86000},
+    {id:3,name:'Fatima Al-Sayed',company:'Gulf Retail',city:'Dubai',country:'UAE',rfqs:11,spend:210000},
+    {id:4,name:'Dmitri Ivanov',company:'Nova Market',city:'Almaty',country:'Kazakhstan',rfqs:3,spend:45000},
+    {id:5,name:'Wei Chen',company:'Chen Imports',city:'Shanghai',country:'China',rfqs:7,spend:160000},
+    {id:6,name:'Priya Sharma',company:'Sharma Distributors',city:'Delhi',country:'India',rfqs:4,spend:62000}
+  ];
+  const rfqsSeed = [
+    {id:1,productName:'Cotton Jersey',category:'Textiles',quantity:1000,targetPrice:7.00,city:'Tashkent',buyer:'Aisha Karim'},
+    {id:2,productName:'Wireless Sensor',category:'Electronics',quantity:500,targetPrice:11.00,city:'Dubai',buyer:'Fatima Al-Sayed'},
+    {id:3,productName:'Basmati Rice',category:'Food & Beverage',quantity:5000,targetPrice:2.20,city:'Delhi',buyer:'Priya Sharma'},
+    {id:4,productName:'Ceramic Dinner',category:'Home & Kitchen',quantity:400,targetPrice:17.50,city:'Istanbul',buyer:'Mehmet Yilmaz'},
+    {id:5,productName:'Portland Cement',category:'Construction',quantity:20000,targetPrice:0.45,city:'Tashkent',buyer:'Dmitri Ivanov'}
+  ];
+  const demandSeed = {'Electronics':88,'Textiles':82,'Food & Beverage':74,'Construction':61,'Home & Kitchen':79,'Agriculture':67};
+  const trendingSeed = [
+    {name:'Wireless Sensor Module',category:'Electronics',change:18.4,priceIndexId:5},
+    {name:'Cotton Jersey Fabric',category:'Textiles',change:12.1,priceIndexId:1},
+    {name:'Ceramic Dinner Set',category:'Home & Kitchen',change:9.7,priceIndexId:13},
+    {name:'Basmati Rice',category:'Food & Beverage',change:6.3,priceIndexId:9},
+    {name:'Smart Plug',category:'Electronics',change:-3.2,priceIndexId:6}
+  ];
+
+  function seeded(seed){let s=seed;return function(){s=(s*9301+49297)%233280;return s/233280;};}
+  function makeSeries(seed,trend){
+    const rnd=seeded(seed);const arr=[];let v=100;
+    for(let i=0;i<15;i++){v=v*(1+trend+(rnd()-0.46)*0.032);arr.push(Math.round(v*10)/10);}
+    return arr;
+  }
+  const priceSeries={};
+  productsSeed.forEach(p=>{ const t = p.category==='Electronics'||p.category==='Textiles'?0.0052:0.0032; priceSeries[p.id]=makeSeries(p.id*37+11,t); });
+
+  function clamp(v,a,b){a=a===undefined?0:a;b=b===undefined?1:b;return Math.max(a,Math.min(b,v));}
+  function distanceKm(a,b){
+    const ca=CITY_COORDS[a],cb=CITY_COORDS[b];
+    if(!ca||!cb)return 3000;
+    const dy=(ca[0]-cb[0])*111, dx=(ca[1]-cb[1])*111*Math.cos(((ca[0]+cb[0])/2)*Math.PI/180);
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+
+  /* ================= APP ================= */
+  createApp({
+    setup(){
+      const currentView = ref('buyer');
+      const role = ref('Buyer');
+      const globalSearch = ref('');
+      const searchFocused = ref(false);
+      const productSearch = ref('');
+      const showForecast = ref(true);
+      const selectedRfqId = ref(1);
+      const selectedChartProduct = ref(1);
+      const rfqForm = reactive({productName:'',category:'',quantity:'',targetPrice:'',city:''});
+      const expanded = reactive({});
+      const toasts = ref([]);
+      let toastSeq = 0;
+
+      const suppliers = ref(suppliersSeed.map(s=>({...s})));
+      const products = ref(productsSeed.map(p=>({...p})));
+      const buyers = ref(buyersSeed.map(b=>({...b})));
+      const rfqs = ref(rfqsSeed.map(r=>({...r})));
+      const demandScores = reactive({...demandSeed});
+      const trending = ref(trendingSeed.map(t=>({...t})));
+      const mySupplier = suppliers.value.find(s=>s.id===1);
+
+      const chatInput = ref('');
+      const typing = ref(false);
+      const chatBody = ref(null);
+      let msgSeq = 0;
+      const messages = ref([{
+        id:++msgSeq,from:'bot',time:nowTime(),
+        text:'Hi! I’m Pulse, your marketplace copilot. I can find suppliers, compare prices, explain RFQs and read market signals. What would you like to explore?',
+        table:null,chips:['Find suppliers of textiles','Cheapest suppliers for electronics','Market trends','How do I create an RFQ?']
+      }]);
+
+      const navMain = [
+        {id:'buyer',label:'Buyer Dashboard',icon:ICONS.dash},
+        {id:'supplier',label:'Supplier Workspace',icon:ICONS.supplier}
+      ];
+      const navIntel = [
+        {id:'match',label:'AI Matchmaking',icon:ICONS.match,badge:''},
+        {id:'pulse',label:'Market Pulse',icon:ICONS.pulse},
+        {id:'assistant',label:'AI Assistant',icon:ICONS.bot}
+      ];
+      const capabilities = [
+        {t:'Supplier discovery',d:'Source verified suppliers by category and region.',icon:'M3 21h18M5 21V7l7-4 7 4v14'},
+        {t:'Price intelligence',d:'Compare live prices and spot the best deals.',icon:'M12 2v20M17 6H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6'},
+        {t:'Market trends',d:'Read demand scores and price forecasts.',icon:'M3 17l6-6 4 4 8-8'},
+        {t:'RFQ guidance',d:'Build requests and understand match scores.',icon:'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z'}
+      ];
+      const starterQuestions = ['Find suppliers of textiles','Cheapest suppliers for electronics','Market trends','Match this RFQ','How do I create an RFQ?'];
+
+      /* ---------- helpers ---------- */
+      function nowTime(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+      function initials(name){return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');}
+      const COLORS=['#0d9488','#4f46e5','#d97706','#0284c7','#7c3aed','#be123c','#047857','#b45309'];
+      function colorFor(name){let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return COLORS[h%COLORS.length];}
+      function ringColor(score){return score>=80?'#14b8a6':score>=65?'#6366f1':score>=50?'#f59e0b':'#94a3b8';}
+      function detectCategory(text){
+        const t=text.toLowerCase();
+        for(const cat in CAT_KEYWORDS){ if(CAT_KEYWORDS[cat].some(k=>t.includes(k))) return cat; }
+        return null;
+      }
+
+      /* ---------- toast ---------- */
+      function showToast(message,type){
+        type=type||'success';
+        const id=++toastSeq;
+        toasts.value.push({id,message,type});
+        setTimeout(()=>dismissToast(id),2800);
+      }
+      function dismissToast(id){toasts.value=toasts.value.filter(t=>t.id!==id);}
+
+      /* ---------- navigation ---------- */
+      function navigate(view){currentView.value=view;globalSearch.value='';searchFocused.value=false;}
+      function switchRole(r){
+        if(role.value===r)return;
+        role.value=r;
+        currentView.value = r==='Buyer'?'buyer':'supplier';
+        showToast('Switched to '+r+' workspace','info');
+      }
+      function pickSupplier(s){
+        globalSearch.value='';searchFocused.value=false;
+        const rfq = rfqs.value.find(r=>r.category===s.category);
+        if(rfq)selectedRfqId.value=rfq.id;
+        navigate('match');
+        showToast('Matching '+s.name+' against your RFQs','success');
+      }
+      function pickProduct(p){
+        selectedChartProduct.value=p.id;
+        navigate('pulse');
+        showToast('Showing market pulse for '+p.name,'info');
+      }
+      function pickTrending(t){pickProduct(products.value.find(p=>p.id===t.priceIndexId)||products.value[0]);}
+      function viewSupplierMatch(s){
+        const rfq = rfqs.value.find(r=>r.category===s.category)||rfqs.value[0];
+        selectedRfqId.value=rfq.id;
+        navigate('match');
+      }
+      function goMatchingForFirst(){selectedRfqId.value=rfqs.value[0].id;navigate('match');}
+      function onRfqChange(){
+        const r=selectedRfq.value;
+        showToast('Recomputed matches for '+r.productName,'info');
+      }
+
+      /* ---------- scoring engine ---------- */
+      function scoreSuppliers(rfq){
+        if(!rfq)return [];
+        const qty=Number(rfq.quantity)||1;
+        const target=Number(rfq.targetPrice)||0;
+        let results=suppliers.value.map(s=>{
+          let prods=products.value.filter(p=>p.supplierId===s.id && (!rfq.category||p.category===rfq.category));
+          if(rfq.productName){
+            const nameL=rfq.productName.toLowerCase();
+            const token=nameL.split(' ')[0];
+            const exact=prods.filter(p=>p.name.toLowerCase().includes(nameL)||p.name.toLowerCase().includes(token));
+            if(exact.length)prods=exact;
+          }
+          const prod=prods[0]||products.value.find(p=>p.supplierId===s.id);
+          const price=prod?prod.price:0;
+          const stock=prod?prod.stock:0;
+          const dist=distanceKm(rfq.city,s.city);
+
+          const sub={
+            price: price>0&&target>0?clamp(target/price):(price>0?0.5:0),
+            rating: clamp(s.rating/5),
+            response: clamp(s.responseRate/100),
+            lead: clamp(1-s.leadTimeDays/45),
+            verified: s.verified?1:0.25,
+            geo: clamp(1-dist/6000),
+            stock: clamp(qty>0?stock/qty:1)
+          };
+          const score=sub.price*W.price+sub.rating*W.rating+sub.response*W.response+sub.lead*W.lead+sub.verified*W.verified+sub.geo*W.geo+sub.stock*W.stock;
+          const reasons=[
+            {label:'Price fit',text:'$'+price.toFixed(2)+' vs $'+target.toFixed(2)+' target',good:price<=target},
+            {label:'Rating',text:s.rating.toFixed(1)+'/5 buyer rating',good:s.rating>=4.3},
+            {label:'Responsiveness',text:s.responseRate+'% inquiry response',good:s.responseRate>=85},
+            {label:'Lead time',text:'Ships in '+s.leadTimeDays+' days',good:s.leadTimeDays<=14},
+            {label:'Verification',text:s.verified?'Verified supplier':'Not yet verified',good:s.verified},
+            {label:'Proximity',text:Math.round(dist)+' km from '+rfq.city,good:dist<1500},
+            {label:'Stock',text:stock.toLocaleString()+' units available',good:stock>=qty}
+          ];
+          return {supplier:s,product:prod,price,stock,score:Math.round(score*100),reasons,total:price*qty,sub};
+        });
+        if(rfq.category){
+          const rel=results.filter(r=>r.product&&r.product.category===rfq.category);
+          if(rel.length)results=rel;
+        }
+        return results.sort((a,b)=>b.score-a.score);
+      }
+
+      /* ---------- chart builder ---------- */
+      function buildChart(values){
+        const Wd=820,H=280,padL=48,padR=16,padT=18,padB=34;
+        const min=Math.min.apply(null,values)*0.96,max=Math.max.apply(null,values)*1.03;
+        const n=values.length;
+        const x=i=>padL+i*(Wd-padL-padR)/(n-1);
+        const y=v=>padT+(max-v)/(max-min)*(H-padT-padB);
+        const actualCount=12;
+        const actualPts=values.slice(0,actualCount).map((v,i)=>({x:x(i),y:y(v)}));
+        const forecastPts=values.slice(actualCount-1).map((v,k)=>({x:x(actualCount-1+k),y:y(v)}));
+        const line=actualPts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
+        const forecastLine=forecastPts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
+        const area='M '+actualPts[0].x.toFixed(1)+','+(H-padB)+' L '+actualPts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' L ')+' L '+actualPts[actualPts.length-1].x.toFixed(1)+','+(H-padB)+' Z';
+        const grid=[0,.25,.5,.75,1].map(f=>{const v=min+f*(max-min);return{y:y(v),label:Math.round(v)};});
+        const months=['Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
+        const xLabels=months.slice(0,n).map((m,i)=>({m,x:x(i)}));
+        return {W:Wd,H,padL,line,forecastLine,area,grid,dots:actualPts,xLabels};
+      }
+
+      /* ---------- RFQ form ---------- */
+      function focusRfqForm(){
+        navigate('buyer');
+        nextTick(()=>{const el=document.getElementById('rfq-form-card');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});});
+      }
+      function resetRfqForm(){rfqForm.productName='';rfqForm.category='';rfqForm.quantity='';rfqForm.targetPrice='';rfqForm.city='';showToast('Form cleared','info');}
+      function submitRfq(){
+        const id=Math.max.apply(null,rfqs.value.map(r=>r.id))+1;
+        const newRfq={id,productName:rfqForm.productName.trim(),category:rfqForm.category,quantity:Number(rfqForm.quantity),targetPrice:Number(rfqForm.targetPrice),city:rfqForm.city,buyer:role.value==='Buyer'?'Aisha Karim':'You'};
+        rfqs.value.push(newRfq);
+        selectedRfqId.value=id;
+        const count=scoreSuppliers(newRfq).length;
+        resetRfqFormSilent();
+        navigate('match');
+        showToast('RFQ created · '+count+' suppliers matched','success');
+      }
+      function resetRfqFormSilent(){rfqForm.productName='';rfqForm.category='';rfqForm.quantity='';rfqForm.targetPrice='';rfqForm.city='';}
+
+      /* ---------- chat ---------- */
+      function respond(text){
+        const t=text.toLowerCase().trim();
+        if(/create.*rfq|rfq.*help|how do i.*rfq|new rfq|build.*rfq/.test(t)){
+          return {text:'Creating an RFQ takes seconds. Go to Buyer Dashboard → Create RFQ, fill in the product, category, quantity, target price and delivery city, then hit “Find AI matches”. Our engine scores every supplier across 7 weighted factors and ranks them instantly.',chips:['Match this RFQ','Find suppliers of textiles']};
+        }
+        if(/match|rank|score|best supplier/.test(t)){
+          const m=matches.value.slice(0,4);
+          if(!m.length)return {text:'There are no suppliers to rank yet — try creating an RFQ first.',chips:['How do I create an RFQ?']};
+          return {text:'I scored your active RFQ against '+suppliers.value.length+' suppliers. Top result: '+m[0].supplier.name+' at '+m[0].score+'% match.',table:{headers:['Supplier','Score','Price','Lead'],rows:m.map(x=>[x.supplier.name,x.score+'%','$'+x.price.toFixed(2),x.supplier.leadTimeDays+'d'])},chips:['Cheapest suppliers for textiles','Market trends']};
+        }
+        if(/cheapest|best price|lowest price|lower price|price/.test(t)){
+          const cat=detectCategory(t)||'Textiles';
+          const list=products.value.filter(p=>p.category===cat).sort((a,b)=>a.price-b.price).slice(0,4);
+          return {text:'Here are the lowest-priced '+cat+' listings right now:',table:{headers:['Product','Supplier','Price','MOQ'],rows:list.map(p=>[p.name,supplierName(p.supplierId),'$'+p.price.toFixed(2)+'/'+p.unit,String(p.minOrder)])},chips:['Find suppliers of '+cat.toLowerCase(),'Market trends']};
+        }
+        if(/trend|forecast|market|demand|pulse/.test(t)){
+          const top=Object.entries(demandScores).sort((a,b)=>b[1]-a[1])[0];
+          return {text:'Market pulse: the overall price index is up 6.2% month-over-month. '+top[0]+' leads demand with a score of '+top[1]+'/100. Textiles and Electronics are the fastest-rising categories, and our 90-day forecast points to a further +8.4% index rise.',chips:['Cheapest suppliers for textiles','Find suppliers of home & kitchen']};
+        }
+        if(/find|supplier|source|looking for|need|who/.test(t)){
+          const cat=detectCategory(t)||'Textiles';
+          const list=suppliers.value.filter(s=>s.category===cat).sort((a,b)=>b.rating-a.rating).slice(0,4);
+          if(!list.length)return {text:'I couldn’t find suppliers for that category. Try Electronics, Textiles, Food & Beverage, Construction, Home & Kitchen or Agriculture.',chips:['Find suppliers of textiles']};
+          return {text:'Found '+list.length+' top-rated '+cat+' suppliers:',table:{headers:['Supplier','City','Rating','Lead'],rows:list.map(s=>[s.name,s.city,s.rating.toFixed(1),s.leadTimeDays+'d'])},chips:['Cheapest suppliers for '+cat.toLowerCase(),'Match this RFQ']};
+        }
+        return {text:'I can help you discover suppliers, compare prices, read market trends, build an RFQ, or explain matchmaking. Try one of the suggestions below.',chips:['Find suppliers of textiles','Market trends','How do I create an RFQ?']};
+      }
+      function supplierName(id){const s=suppliers.value.find(x=>x.id===id);return s?s.name:'—';}
+      function sendMessage(override){
+        const content=(override||chatInput.value||'').trim();
+        if(!content)return;
+        messages.value.push({id:++msgSeq,from:'user',time:nowTime(),text:content,table:null,chips:[]});
+        chatInput.value='';
+        typing.value=true;
+        scrollChat();
+        const reply=respond(content);
+        setTimeout(()=>{
+          messages.value.push({id:++msgSeq,from:'bot',time:nowTime(),text:reply.text,table:reply.table||null,chips:reply.chips||[]});
+          typing.value=false;
+          scrollChat();
+        },680);
+      }
+      function scrollChat(){nextTick(()=>{if(chatBody.value)chatBody.value.scrollTop=chatBody.value.scrollHeight;});}
+      function clearChat(){
+        messages.value=[{id:++msgSeq,from:'bot',time:nowTime(),text:'Chat cleared. What would you like to explore?',table:null,chips:starterQuestions.slice(0,4)}];
+        showToast('Conversation cleared','info');
+      }
+
+      /* ---------- supplier workspace helpers ---------- */
+      function stockStatus(p){return p.stock<=0?'out':p.stock<p.minOrder*3?'low':'in';}
+      function stockLabel(p){const s=stockStatus(p);return s==='out'?'Out of stock':s==='low'?'Low stock':'In stock';}
+      function toggleReason(id){expanded[id]=!expanded[id];}
+
+      /* ---------- computed ---------- */
+      const currentTitle=computed(()=>({
+        buyer:'Buyer Dashboard',supplier:'Supplier Workspace',match:'AI Matchmaking',pulse:'Market Pulse',assistant:'AI Assistant'
+      })[currentView.value]);
+      const selectedRfq=computed(()=>rfqs.value.find(r=>r.id===selectedRfqId.value)||rfqs.value[0]);
+      const matches=computed(()=>scoreSuppliers(selectedRfq.value));
+      const recommendations=computed(()=>matches.value.slice(0,3));
+      const avgMatch=computed(()=>{const m=matches.value;return m.length?Math.round(m.reduce((a,b)=>a+b.score,0)/m.length):0;});
+      const verifiedCount=computed(()=>suppliers.value.filter(s=>s.verified).length);
+      const marketPulse=computed(()=>{const s=priceSeries[1];return (s[s.length-1]).toFixed(1);});
+      const myProducts=computed(()=>products.value.filter(p=>p.supplierId===mySupplier.id));
+      const filteredCatalog=computed(()=>{
+        const q=productSearch.value.trim().toLowerCase();
+        return myProducts.value.filter(p=>!q||p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q));
+      });
+      const relevantInquiries=computed(()=>rfqs.value.filter(r=>r.category===mySupplier.category).length+12);
+      const globalResults=computed(()=>{
+        const q=globalSearch.value.trim().toLowerCase();
+        if(!q)return{suppliers:[],products:[]};
+        return {
+          suppliers:suppliers.value.filter(s=>(s.name+' '+s.category+' '+s.city+' '+s.country).toLowerCase().includes(q)).slice(0,4),
+          products:products.value.filter(p=>(p.name+' '+p.category).toLowerCase().includes(q)).slice(0,4)
+        };
+      });
+      const chartProduct=computed(()=>products.value.find(p=>p.id===selectedChartProduct.value)||products.value[0]);
+      const priceChart=computed(()=>buildChart(priceSeries[selectedChartProduct.value]||priceSeries[1]));
+      const indexChange=computed(()=>{
+        const s=priceSeries[selectedChartProduct.value]||priceSeries[1];
+        return (s[14]/s[0]-1)*100;
+      });
+      const insights=computed(()=>{
+        const ranked=Object.entries(demandScores).sort((a,b)=>b[1]-a[1]);
+        return [
+          {kind:'up',sym:'↑',title:ranked[0][0]+' demand is surging',desc:'Demand score '+ranked[0][1]+'/100. Consider a 4–6% price increase on your best-sellers.',cta:'Review pricing',action:()=>{navigate('pulse');showToast('Opening market pulse','info');}},
+          {kind:'geo',sym:'◈',title:'Hotspot: Dubai',desc:'Buyer inquiries in Dubai rose 22% this month for Home & Kitchen goods.',cta:'Explore market',action:()=>{navigate('pulse');showToast('Showing Dubai demand signals','info');}},
+          {kind:'down',sym:'↓',title:'Electronics softening',desc:'Price index down 3.2% over 90 days — avoid overstocking slow SKUs.',cta:'See pulse',action:()=>{selectedChartProduct.value=5;navigate('pulse');showToast('Showing electronics index','info');}}
+        ];
+      });
+
+      return {
+        currentView,currentTitle,role,navMain,navIntel,capabilities,starterQuestions,
+        globalSearch,searchFocused,globalResults,productSearch,showForecast,
+        selectedRfqId,selectedRfq,selectedChartProduct,chartProduct,indexChange,
+        rfqForm,expanded,toasts,showToast,dismissToast,
+        suppliers,products,buyers,rfqs,demandScores,trending,categories:CATEGORIES,cityList:CITY_LIST,
+        weights:WEIGHTS,matches,recommendations,avgMatch,verifiedCount,marketPulse,
+        mySupplier,myProducts,filteredCatalog,relevantInquiries,insights,
+        priceChart,talking:typing,typing,chatInput,chatBody,messages,
+        navigate,switchRole,pickSupplier,pickProduct,pickTrending,viewSupplierMatch,goMatchingForFirst,onRfqChange,
+        focusRfqForm,resetRfqForm,submitRfq,toggleReason,ringColor,colorFor,initials,
+        stockStatus,stockLabel,sendMessage,clearChat
+      };
+    }
+  }).mount('#app');
+})();
+</script>
+</body>
+</html>
